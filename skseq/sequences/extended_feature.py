@@ -52,7 +52,7 @@ class ExtendedFeatures(IDFeatures):
             if feat_id != -1:
                 features.append(feat_id)
 
-        # uppercased
+        # lowercased
         if str.islower(word):
             # generate  feature name
             feat_name = "lowercased::%s" % y_name
@@ -159,19 +159,7 @@ class ExtendedFeatures(IDFeatures):
             # append feature
             if feat_id != -1:
                 features.append(feat_id)
-
-        # word is a preposition
-        if word.lower() in prepositions:
-            # generate  feature name
-            feat_name = "preposition::%s" % y_name
-            feat_name = str(feat_name)
-
-            #get feature id from name
-            feat_id =self.add_feature(feat_name)
-            # append feature
-            if feat_id != -1:
-                features.append(feat_id)
-        """
+        
         # word is a stopword
         if word.lower() in stopwords:
             # generate  feature name
@@ -183,7 +171,7 @@ class ExtendedFeatures(IDFeatures):
             # append feature
             if feat_id != -1:
                 features.append(feat_id)
-        """
+
         # word has a hyphen
         if "-" in word:
             # generate  feature name
@@ -219,7 +207,6 @@ class ExtendedFeatures(IDFeatures):
             # append feature
             if feat_id != -1:
                 features.append(feat_id)
-
         
         # word has a chemical prefix
         for pre in chem_prefix:
@@ -261,10 +248,10 @@ class ExtendedFeatures(IDFeatures):
                     features.append(feat_id)
         
         # word has a person suffix
-        for pre in person_suffix:
-            if str.startswith(word.lower(), pre):
+        for suf in person_suffix:
+            if str.endswith(word.lower(), suf):
                 # generate  feature name
-                feat_name = f"personsuffix{pre}::{y_name}"
+                feat_name = f"personsuffix{suf}::{y_name}"
                 feat_name = str(feat_name)
 
                 #get feature id from name
@@ -274,10 +261,10 @@ class ExtendedFeatures(IDFeatures):
                     features.append(feat_id)
         
         # word has a person suffix
-        for pre in geographical_suffix:
-            if str.startswith(word.lower(), pre):
+        for suf in geographical_suffix:
+            if str.endswith(word.lower(), suf):
                 # generate  feature name
-                feat_name = f"geographsuffix{pre}::{y_name}"
+                feat_name = f"geographsuffix{suf}::{y_name}"
                 feat_name = str(feat_name)
 
                 #get feature id from name
