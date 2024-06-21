@@ -10,6 +10,12 @@ def gen_set(path):
     df.dropna(axis=0, inplace=True)
     X = df.groupby('sentence_id')['words'].apply(list).values
     y = df.groupby('sentence_id')['tags'].apply(list).values
+
+    #for i, sentence in enumerate(X):
+    #    for word in sentence:
+    #        if pd.isna(word):
+    #            X = np.delete(X, i, 0)
+    #            y = np.delete(y, i, 0)
     return X, y
 
 
@@ -31,7 +37,7 @@ def dictionary(sentences, tags):
 
     word_dict = dict(word_dict)
     tag_dict = dict(tag_dict)
-    rev_dict = {v: k for k, v in tag_dict.items()}  # Reverse tag dictionary
+    rev_dict = {v: k for k, v in tag_dict.items()}
 
     return word_dict, tag_dict, rev_dict
 
@@ -51,11 +57,11 @@ def get_predictions(sp, X):
     y_hats = np.concatenate(y_hats)
     return y_hats
 
-def accuracy_score(y, y_hat):
+def accuracy_score(y, y_hat, defeq=0):
     tptn = 0
     c = 0
     for y_true, y_pred in zip(y, y_hat):
-        if y_true != 0:
+        if y_true != defeq:
             if y_true == y_pred:
                 tptn += 1
             c+=1
@@ -70,17 +76,19 @@ def cfn_matrix(y, y_hat, rev_dict):
             _y_hat.append(rev_dict[tag2])
     
     tags = [rev_dict[tag] for tag in np.unique(np.concatenate((y, y_hat)))]
-    tags.remove("O")
+    #tags.remove("O")
     _, ax = plt.subplots(figsize=(10, 10))
-    ConfusionMatrixDisplay.from_predictions(_y, _y_hat, labels=tags, ax=ax, normalize="true")
+    ConfusionMatrixDisplay.from_predictions(_y, _y_hat, labels=tags, ax=ax)
 
 
 def evaluate(y, y_hat, rev_dict):
     accuracy = accuracy_score(y, y_hat)
+    accuracyO = accuracy_score(y, y_hat, "O")
     f1 = f1_score(y, y_hat, average='weighted')
     
     cfn_matrix(y, y_hat, rev_dict)
     return {
+        "accuracy with O" : accuracyO,
         "accuracy" : accuracy,
         "f1_score" : f1
     }
