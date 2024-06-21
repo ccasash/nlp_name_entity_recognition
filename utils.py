@@ -1,4 +1,4 @@
-from sklearn.metrics import f1_score, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import f1_score, confusion_matrix
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -82,12 +82,22 @@ def cfn_matrix(y, y_hat, rev_dict):
     tags_no.remove("O")
     #_, ax = plt.subplots(figsize=(10, 10))
     #ConfusionMatrixDisplay.from_predictions(_y, _y_hat, labels=tags, ax=ax)
+    conf_matrix = confusion_matrix(_y, _y_hat)
     plt.figure(figsize=(10, 10))
     sns.heatmap(conf_matrix, annot=True, fmt='d', xticklabels=tags, yticklabels=tags, cmap='Blues')
     plt.xlabel('Predicted')
     plt.ylabel('True')
     plt.title('Confusion Matrix')
     plt.show()
+
+def print_tiny_test(X,ypred):
+    print("=========TINY TEST=========")
+    i = 0
+    for sentence in X:
+        for _, word in enumerate(sentence):
+            i += 1
+            print(word+"/"+ypred[i], end=" ")
+        print()
 
 
 def evaluate(y, y_hat, rev_dict):
