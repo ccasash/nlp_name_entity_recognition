@@ -90,13 +90,13 @@ def cfn_matrix(y, y_hat, rev_dict):
     plt.title('Confusion Matrix')
     plt.show()
 
-def print_tiny_test(X,ypred):
+def print_tiny_test(X,ypred, int2tag):
     print("=========TINY TEST=========")
     i = 0
     for sentence in X:
         for _, word in enumerate(sentence):
+            print(word+"/"+int2tag[ypred[i]], end=" ")
             i += 1
-            print(word+"/"+ypred[i], end=" ")
         print()
 
 
