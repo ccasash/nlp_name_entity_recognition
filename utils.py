@@ -5,6 +5,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from skseq.sequences.sequence_list import SequenceList
 from skseq.sequences.label_dictionary import LabelDictionary
+import csv
+from collections import defaultdict
+from tqdm import tqdm
+import torch
+import torch.utils.data as data
+import torch
+from tqdm import tqdm
+from sklearn.metrics import confusion_matrix
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def gen_set(path):
@@ -123,3 +134,42 @@ def evaluate_integers(y, y_hat, dict2id, rev_dict):
         "accuracy" : accuracy,
         "f1_score" : f1
     }
+
+def parse_dataset(filename):
+  sentences = defaultdict(list)
+  labels = defaultdict(list)
+
+  with open(filename, mode='r', newline='') as file:
+      reader = csv.DictReader(file)
+
+      for row in reader:
+          sentence_id = int(row['sentence_id'])
+          word = row['words']
+          tag = row['tags']
+
+          sentences[sentence_id].append(word)
+          labels[sentence_id].append(tag)
+
+  sentences_list = [' '.join(sentences[sid]) for sid in sorted(sentences.keys())]
+  labels_list = [labels[sid] for sid in sorted(labels.keys())]
+
+  return sentences_list, labels_list
+
+class Params:
+    def __init__(self, obj):
+        for k, v in obj.items():
+            setattr(self, k, v)
+
+class NERDataset(torch.utils.data.Dataset):
+  def __init__(self, sentences, labels):
+    self.sentences = sentences
+    self.labels = labels
+
+  def __len__(self):
+    return len(self.sentences)
+
+  def __getitem__(self, idx):
+    sid = self.sentences[idx]
+    lid = self.labels[idx]
+    return sid, torch.tensor([label2id[x] for x in lid])
+  
