@@ -2,8 +2,10 @@ from sklearn.metrics import f1_score, confusion_matrix, ConfusionMatrixDisplay
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from skseq.sequences.sequence_list import SequenceList
 from skseq.sequences.label_dictionary import LabelDictionary
+
 
 def gen_set(path):
     df = pd.read_csv(path)
@@ -76,9 +78,16 @@ def cfn_matrix(y, y_hat, rev_dict):
             _y_hat.append(rev_dict[tag2])
     
     tags = [rev_dict[tag] for tag in np.unique(np.concatenate((y, y_hat)))]
-    #tags.remove("O")
-    _, ax = plt.subplots(figsize=(10, 10))
-    ConfusionMatrixDisplay.from_predictions(_y, _y_hat, labels=tags, ax=ax)
+    tags_no = tags.copy()
+    tags_no.remove("O")
+    #_, ax = plt.subplots(figsize=(10, 10))
+    #ConfusionMatrixDisplay.from_predictions(_y, _y_hat, labels=tags, ax=ax)
+    plt.figure(figsize=(10, 10))
+    sns.heatmap(conf_matrix, annot=True, fmt='d', xticklabels=tags, yticklabels=tags, cmap='Blues')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title('Confusion Matrix')
+    plt.show()
 
 
 def evaluate(y, y_hat, rev_dict):
@@ -93,3 +102,14 @@ def evaluate(y, y_hat, rev_dict):
         "f1_score" : f1
     }
 
+def evaluate_integers(y, y_hat, dict2id, rev_dict):
+    accuracy = accuracy_score(y, y_hat)
+    accuracyO = accuracy_score(y, y_hat, dict2id["O"])
+    f1 = f1_score(y, y_hat, average='weighted')
+    
+    cfn_matrix(y, y_hat, rev_dict)
+    return {
+        "accuracy with O" : accuracyO,
+        "accuracy" : accuracy,
+        "f1_score" : f1
+    }
